@@ -64,7 +64,7 @@ export function ProfilePhotoScreen({
 
         <Button
           onClick={() => fileInputRef.current?.click()}
-          className="w-full h-12 mb-3 bg-black hover:bg-neutral-800 text-white text-base font-semibold rounded-lg flex items-center justify-center gap-2"
+          className="w-full h-12 mb-3 bg-neutral-900 hover:bg-neutral-800 text-white text-base font-semibold rounded-lg flex items-center justify-center gap-2"
         >
           <Upload className="w-5 h-5" />
           Upload a photo

@@ -194,7 +194,7 @@ export function ProfileSetupScreen({
 
         <Button
           onClick={handleContinue}
-          className="w-full h-12 bg-red-600 hover:bg-red-700 text-white text-base font-semibold rounded-lg"
+          className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground text-base font-semibold rounded-lg"
         >
           Agree and continue
         </Button>

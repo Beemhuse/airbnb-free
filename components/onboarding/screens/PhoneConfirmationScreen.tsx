@@ -62,7 +62,7 @@ export function PhoneConfirmationScreen({
 
         <Button
           onClick={handleContinue}
-          className="w-full h-12 mb-6 bg-black hover:bg-neutral-800 text-white text-base font-semibold rounded-lg"
+          className="w-full h-12 mb-6 bg-neutral-900 hover:bg-neutral-800 text-white text-base font-semibold rounded-lg"
         >
           Continue
         </Button>
