@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
-import { ChevronLeft, Eye, EyeOff } from 'lucide-react';
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ChevronLeft, Eye, EyeOff } from "lucide-react";
+import FloatingInput from "@/components/ui/floating-input";
 
 interface ProfileSetupScreenProps {
   onContinue: (data: {
@@ -26,30 +27,36 @@ export function ProfileSetupScreen({
   onBack,
   initialData,
 }: ProfileSetupScreenProps) {
-  const [firstName, setFirstName] = useState(initialData?.firstName || '');
-  const [lastName, setLastName] = useState(initialData?.lastName || '');
-  const [birthDate, setBirthDate] = useState(initialData?.birthDate || '');
-  const [email, setEmail] = useState(initialData?.email || '');
-  const [password, setPassword] = useState('');
+  const [firstName, setFirstName] = useState(initialData?.firstName || "");
+  const [lastName, setLastName] = useState(initialData?.lastName || "");
+  const [birthDate, setBirthDate] = useState(initialData?.birthDate || "");
+  const [email, setEmail] = useState(initialData?.email || "");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
 
   const calculatePasswordStrength = (pwd: string) => {
-    if (!pwd) return 'weak';
-    if (pwd.length < 8) return 'weak';
-    if (!/[A-Z]/.test(pwd) || !/[0-9]/.test(pwd)) return 'medium';
-    return 'strong';
+    if (!pwd) return "weak";
+    if (pwd.length < 8) return "weak";
+    if (!/[A-Z]/.test(pwd) || !/[0-9]/.test(pwd)) return "medium";
+    return "strong";
   };
 
   const passwordStrength = calculatePasswordStrength(password);
 
   const handleContinue = () => {
-    if (!firstName.trim() || !lastName.trim() || !birthDate || !email.trim() || !password) {
-      alert('Please fill in all fields');
+    if (
+      !firstName.trim() ||
+      !lastName.trim() ||
+      !birthDate ||
+      !email.trim() ||
+      !password
+    ) {
+      alert("Please fill in all fields");
       return;
     }
     if (!agreedToTerms) {
-      alert('Please agree to the terms');
+      alert("Please agree to the terms");
       return;
     }
     onContinue({
@@ -71,38 +78,36 @@ export function ProfileSetupScreen({
           <ChevronLeft className="w-6 h-6" />
         </button>
 
-        <h2 className="text-2xl font-bold text-neutral-900 mb-8">Finish signing up</h2>
+        <h2 className="text-2xl font-bold text-neutral-900 mb-8">
+          Finish signing up
+        </h2>
 
         <div className="space-y-6 mb-6">
-          <div className="flex gap-4">
-            <div className="flex-1">
-              <label className="text-sm text-neutral-600 block mb-2">First name</label>
-              <Input
-                type="text"
-                placeholder="John"
+          <div className="block gap-4">
+            <div className="border  border-neutral-300 rounded-lg ">
+              {/* <label className="text-sm text-neutral-600 block mb-2">First name</label> */}
+              <FloatingInput
+                label="First name"
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
-                className="h-12 text-base"
+                containerClassName="border-0 border-b rounded-none"
               />
-            </div>
-            <div className="flex-1">
-              <label className="text-sm text-neutral-600 block mb-2">Last name</label>
-              <Input
-                type="text"
-                placeholder="Smith"
+              <FloatingInput
+                label="Last name"
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
-                className="h-12 text-base"
+                containerClassName="border-0  rounded-none"
               />
             </div>
+            <label className="text-sm text-neutral-500 block mb-2">
+              Make sure it matches the name on your government ID.
+            </label>
           </div>
 
           <div>
-            <label className="text-sm text-neutral-600 block mb-2">Make sure it matches the name on your government ID.</label>
-          </div>
-
-          <div>
-            <label className="text-sm text-neutral-600 block mb-2">Birthdate</label>
+            <label className="text-sm text-neutral-600 block mb-2">
+              Birthdate
+            </label>
             <Input
               type="date"
               value={birthDate}
@@ -110,7 +115,8 @@ export function ProfileSetupScreen({
               className="h-12 text-base"
             />
             <p className="text-xs text-neutral-500 mt-2">
-              To sign up, you need to be at least 18. Your birthday won&apos;t be shared with other people who use Airbnb.
+              To sign up, you need to be at least 18. Your birthday won&apos;t
+              be shared with other people who use Airbnb.
             </p>
           </div>
 
@@ -129,10 +135,12 @@ export function ProfileSetupScreen({
           </div>
 
           <div>
-            <label className="text-sm text-neutral-600 block mb-2">Password</label>
+            <label className="text-sm text-neutral-600 block mb-2">
+              Password
+            </label>
             <div className="relative">
               <Input
-                type={showPassword ? 'text' : 'password'}
+                type={showPassword ? "text" : "password"}
                 placeholder="••••••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -153,11 +161,11 @@ export function ProfileSetupScreen({
               <p className="text-xs text-neutral-500 mt-2 flex items-center gap-2">
                 <span
                   className={`w-2 h-2 rounded-full ${
-                    passwordStrength === 'strong'
-                      ? 'bg-green-600'
-                      : passwordStrength === 'medium'
-                      ? 'bg-yellow-500'
-                      : 'bg-red-500'
+                    passwordStrength === "strong"
+                      ? "bg-green-600"
+                      : passwordStrength === "medium"
+                        ? "bg-yellow-500"
+                        : "bg-red-500"
                   }`}
                 />
                 Password strength: {passwordStrength}
@@ -172,19 +180,26 @@ export function ProfileSetupScreen({
               onCheckedChange={(checked) => setAgreedToTerms(checked === true)}
               className="mt-1"
             />
-            <label htmlFor="terms" className="text-xs text-neutral-600 leading-relaxed">
-              By selecting{' '}
-              <span className="font-semibold">Agree and continue</span>, I agree to Airbnb&apos;s{' '}
+            <label
+              htmlFor="terms"
+              className="text-xs text-neutral-600 leading-relaxed"
+            >
+              By selecting{" "}
+              <span className="font-semibold">Agree and continue</span>, I agree
+              to Airbnb&apos;s{" "}
               <a href="#" className="text-blue-600 hover:underline">
                 Terms of Service
               </a>
-              , <a href="#" className="text-blue-600 hover:underline">
+              ,{" "}
+              <a href="#" className="text-blue-600 hover:underline">
                 Payments Terms of Service
               </a>
-              , and <a href="#" className="text-blue-600 hover:underline">
+              , and{" "}
+              <a href="#" className="text-blue-600 hover:underline">
                 Nondiscrimination Policy
-              </a>{' '}
-              and acknowledge the <a href="#" className="text-blue-600 hover:underline">
+              </a>{" "}
+              and acknowledge the{" "}
+              <a href="#" className="text-blue-600 hover:underline">
                 Privacy Policy
               </a>
               .
