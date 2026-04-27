@@ -1,7 +1,7 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import Modal from './Modal'
+import Modal from '../Modal'
 
 interface CommunityCommitmentModalProps {
   onAgree: () => void
