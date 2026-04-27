@@ -97,6 +97,7 @@ export function OnboardingFlow() {
           phoneNumber={formData.phone}
           onContinue={handlePhoneConfirmation}
           onBack={() => goToStep('login')}
+          isOpen={currentStep === 'phone-confirmation'}
         />
       )}
 
@@ -113,12 +114,11 @@ export function OnboardingFlow() {
         />
       )}
 
-      {showCommunityModal && (
-        <CommunityCommitmentModal
-          onAgree={handleCommunityAgree}
-          onDecline={handleCommunityDecline}
-        />
-      )}
+      <CommunityCommitmentModal
+        onAgree={handleCommunityAgree}
+        onDecline={handleCommunityDecline}
+        isOpen={showCommunityModal}
+      />
 
       {currentStep === 'profile-photo' && (
         <ProfilePhotoScreen

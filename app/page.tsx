@@ -1,3 +1,4 @@
+import Navbar from '@/components/Navbar';
 import { OnboardingFlow } from '@/components/onboarding/OnboardingFlow';
 
 export const metadata = {
@@ -6,5 +7,10 @@ export const metadata = {
 };
 
 export default function Home() {
-  return <OnboardingFlow />;
+  return (
+    <>
+      <Navbar />
+      <OnboardingFlow />
+    </>
+  );
 }
