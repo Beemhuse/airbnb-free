@@ -35,6 +35,7 @@ export default function Navbar() {
             alt="airbnb logo"
             width={32}
             height={32}
+            loading="eager"
           />
           <span className="text-[#FF385C] text-xl font-bold tracking-tight hidden lg:inline">
             airbnb

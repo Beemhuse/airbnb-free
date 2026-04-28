@@ -58,57 +58,66 @@ export function LoginScreen({ onClose, onSuccess }: LoginScreenProps) {
             Welcome to Airbnb
           </h1>
 
-          <div className="space-y-4 mb-6">
-            <FloatingInput
-              label="Email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              autoComplete="email"
-            />
-            <div className="relative">
-              <FloatingInput
-                label="Password"
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                autoComplete="current-password"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-semibold underline text-neutral-900"
-              >
-                {showPassword ? 'Hide' : 'Show'}
-              </button>
-            </div>
-          </div>
-
-          {authError && (
-            <p className="text-destructive text-sm mb-4">{authError instanceof Error ? authError.message : "Login failed"}</p>
-          )}
-
-          <Button
-            onClick={handleLogin}
-            disabled={isLoggingIn || !email || !password}
-            className={clsx(
-              "w-full h-12 mb-6 text-base font-semibold rounded-lg",
-              isLoggingIn || !email || !password
-                ? "bg-neutral-400 text-white cursor-not-allowed"
-                : "bg-primary hover:bg-primary/90 text-primary-foreground"
-            )}
+          <form 
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleLogin();
+            }}
+            className="space-y-4"
           >
-            {isLoggingIn ? (
-
-              <div className="flex items-center justify-center gap-1">
-                <span className="w-1.5 h-1.5 bg-current rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-                <span className="w-1.5 h-1.5 bg-current rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-                <span className="w-1.5 h-1.5 bg-current rounded-full animate-bounce"></span>
+            <div className="space-y-4 mb-6">
+              <FloatingInput
+                label="Email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                autoComplete="email"
+              />
+              <div className="relative">
+                <FloatingInput
+                  label="Password"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="current-password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-semibold underline text-neutral-900"
+                >
+                  {showPassword ? 'Hide' : 'Show'}
+                </button>
               </div>
-            ) : (
-              "Log in"
+            </div>
+
+            {authError && (
+              <p className="text-destructive text-sm mb-4">{authError instanceof Error ? authError.message : "Login failed"}</p>
             )}
-          </Button>
+
+            <Button
+              type="submit"
+              disabled={isLoggingIn || !email || !password}
+              className={clsx(
+                "w-full h-12 mb-6 text-base font-semibold rounded-lg",
+                isLoggingIn || !email || !password
+                  ? "bg-neutral-400 text-white cursor-not-allowed"
+                  : "bg-primary hover:bg-primary/90 text-primary-foreground"
+              )}
+            >
+              {isLoggingIn ? (
+
+                <div className="flex items-center justify-center gap-1">
+                  <span className="w-1.5 h-1.5 bg-current rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                  <span className="w-1.5 h-1.5 bg-current rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                  <span className="w-1.5 h-1.5 bg-current rounded-full animate-bounce"></span>
+                </div>
+              ) : (
+                "Log in"
+              )}
+            </Button>
+          </form>
+
 
           <div className="relative mb-6">
             <div className="absolute inset-0 flex items-center">

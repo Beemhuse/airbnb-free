@@ -2,7 +2,7 @@
 import { useOnboarding } from '@/hooks/useOnboarding';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
-import { sendOtp, verifyOtp, uploadAvatar, checkUser } from '@/lib/api';
+import { sendOtp, verifyOtp, uploadAvatar } from '@/lib/api';
 
 
 
@@ -46,23 +46,10 @@ export function OnboardingFlow({ onClose }: OnboardingFlowProps) {
       country,
     });
     
-    try {
-      const { exists } = await checkUser(phone || emailOrPhone);
-      if (exists) {
-        goToStep('login-password');
-      } else {
-        goToStep('profile-setup');
-      }
-    } catch (error: unknown) {
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to check user",
-        variant: "destructive",
-      });
-      goToStep('profile-setup');
-    }
-
+    // Default to profile setup as checkUser is disabled
+    goToStep('profile-setup');
   };
+
 
   const handleLoginPassword = async (password: string) => {
     const identifier = formData.phone || formData.email;

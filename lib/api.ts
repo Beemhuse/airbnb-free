@@ -44,17 +44,7 @@ export async function fetchListings(category?: string) {
   return response.json();
 }
 
-export async function checkUser(identifier: string) {
-  const response = await apiFetch(`${API_URL}/auth/check-user`, {
-    method: "POST",
-    body: JSON.stringify({ identifier }),
-  });
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({}));
-    throw new Error(error.message || "Failed to check user");
-  }
-  return response.json();
-}
+
 
 export async function sendOtp(email: string) {
   const response = await apiFetch(`${API_URL}/auth/send-otp`, {
