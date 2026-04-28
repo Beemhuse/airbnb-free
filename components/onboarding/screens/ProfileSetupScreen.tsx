@@ -8,7 +8,7 @@ import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 
 interface ProfileSetupScreenProps {
-  // eslint-disable-next-line no-unused-vars
+   
   onContinue: (_data: {
     firstName: string;
     lastName: string;
@@ -109,149 +109,156 @@ export function ProfileSetupScreen({
           </div>
         </div>
         <div className=" p-8">
-          <div className="space-y-6 mb-6">
-            <div className="block gap-4">
-              <div className="border border-neutral-300 rounded-lg overflow-hidden">
-                <FloatingInput
-                  label="First name"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  containerClassName="border-0 border-b rounded-none"
-                  errorMessage={errors.firstName}
-                />
-                <FloatingInput
-                  label="Last name"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  containerClassName="border-0 rounded-none"
-                  errorMessage={errors.lastName}
-                />
-              </div>
-              <p className="text-xs text-neutral-500 mt-2">
-                Make sure it matches the name on your government ID.
-              </p>
-            </div>
-
-            <div>
-              <FloatingInput
-                label="Birthdate"
-                type="date"
-                value={birthDate}
-                onChange={(e) => setBirthDate(e.target.value)}
-                errorMessage={errors.birthDate}
-              />
-              <p className="text-xs text-neutral-500 mt-2">
-                To sign up, you need to be at least 18. Your birthday won't be shared with other people who use Airbnb.
-              </p>
-            </div>
-
-            <div>
-              <FloatingInput
-                label="Email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                errorMessage={errors.email}
-              />
-              <p className="text-xs text-neutral-500 mt-2">
-                We'll email you trip confirmations and receipts.
-              </p>
-            </div>
-
-            <div>
-              <div className="space-y-2">
-                <div className="relative">
-                  <FloatingInput
-                    label="Password"
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    inputClassName="pr-12"
-                    errorMessage={errors.password}
-                  />
-
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword((prev) => !prev)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-medium text-neutral-700"
-                  >
-                    {showPassword ? "Hide" : "Show"}
-                  </button>
-                </div>
-
-                {password && (
-                  <div className="space-y-1 mt-2">
-                    {rules.map((rule, index) => (
-                      <div
-                        key={index}
-                        className={clsx(
-                          "flex items-center gap-2 text-xs",
-                          rule.valid ? "text-green-600" : "text-red-500",
-                        )}
-                      >
-                        <span
-                          className={clsx(
-                            "w-2 h-2 rounded-full",
-                            rule.valid ? "bg-green-600" : "bg-red-500",
-                          )}
-                        />
-                        <span>{rule.label}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3">
-              <label
-                htmlFor="terms"
-                className="text-xs text-neutral-600 text-justify leading-relaxed"
-              >
-                By selecting <strong> Agree and continue</strong>, I agree to
-                Airbnb's{" "}
-                <Link href={"#"} className="text-blue-800 font-bold underline">
-                  {" "}
-                  Terms of service, Payments Terms of Service
-                </Link>{" "}
-                , and{" "}
-                <Link href={"#"} className="text-blue-800 font-bold underline">
-                  {" "}
-                  Nondiscrimination Policy
-                </Link>{" "}
-                and acknowledge the{" "}
-                <Link href={"#"} className="text-blue-800 font-bold underline">
-                  Privacy Policy{" "}
-                </Link>
-                {errors.terms && (
-                  <span className="block text-destructive mt-1 font-medium">
-                    {errors.terms}
-                  </span>
-                )}
-              </label>
-            </div>
-          </div>
-
-          <Button
-            onClick={handleContinue}
-            disabled={loading}
-            className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground text-base font-semibold rounded-lg disabled:bg-neutral-400 disabled:opacity-100 disabled:cursor-not-allowed"
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleContinue();
+            }}
           >
-
-            {loading ? (
-              <div className="flex items-center gap-1">
-                <span className="w-1.5 h-1.5 bg-current rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-                <span className="w-1.5 h-1.5 bg-current rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-                <span className="w-1.5 h-1.5 bg-current rounded-full animate-bounce"></span>
+            <div className="space-y-6 mb-6">
+              <div className="block gap-4">
+                <div className="border border-neutral-300 rounded-lg overflow-hidden">
+                  <FloatingInput
+                    label="First name"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    containerClassName="border-0 border-b rounded-none"
+                    errorMessage={errors.firstName}
+                  />
+                  <FloatingInput
+                    label="Last name"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    containerClassName="border-0 rounded-none"
+                    errorMessage={errors.lastName}
+                  />
+                </div>
+                <p className="text-xs text-neutral-500 mt-2">
+                  Make sure it matches the name on your government ID.
+                </p>
               </div>
-            ) : (
-              "Agree and continue"
-            )}
-          </Button>
 
+              <div>
+                <FloatingInput
+                  label="Birthdate"
+                  type="date"
+                  value={birthDate}
+                  onChange={(e) => setBirthDate(e.target.value)}
+                  errorMessage={errors.birthDate}
+                />
+                <p className="text-xs text-neutral-500 mt-2">
+                  To sign up, you need to be at least 18. Your birthday won't be shared with other people who use Airbnb.
+                </p>
+              </div>
+
+              <div>
+                <FloatingInput
+                  label="Email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  errorMessage={errors.email}
+                />
+                <p className="text-xs text-neutral-500 mt-2">
+                  We'll email you trip confirmations and receipts.
+                </p>
+              </div>
+
+              <div>
+                <div className="space-y-2">
+                  <div className="relative">
+                    <FloatingInput
+                      label="Password"
+                      type={showPassword ? "text" : "password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      inputClassName="pr-12"
+                      errorMessage={errors.password}
+                      autoComplete="new-password"
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-medium text-neutral-700"
+                    >
+                      {showPassword ? "Hide" : "Show"}
+                    </button>
+                  </div>
+
+                  {password && (
+                    <div className="space-y-1 mt-2">
+                      {rules.map((rule, index) => (
+                        <div
+                          key={index}
+                          className={clsx(
+                            "flex items-center gap-2 text-xs",
+                            rule.valid ? "text-green-600" : "text-red-500",
+                          )}
+                        >
+                          <span
+                            className={clsx(
+                              "w-2 h-2 rounded-full",
+                              rule.valid ? "bg-green-600" : "bg-red-500",
+                            )}
+                          />
+                          <span>{rule.label}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <label
+                  htmlFor="terms"
+                  className="text-xs text-neutral-600 text-justify leading-relaxed"
+                >
+                  By selecting <strong> Agree and continue</strong>, I agree to
+                  Airbnb's{" "}
+                  <Link href={"#"} className="text-blue-800 font-bold underline">
+                    {" "}
+                    Terms of service, Payments Terms of Service
+                  </Link>{" "}
+                  , and{" "}
+                  <Link href={"#"} className="text-blue-800 font-bold underline">
+                    {" "}
+                    Nondiscrimination Policy
+                  </Link>{" "}
+                  and acknowledge the{" "}
+                  <Link href={"#"} className="text-blue-800 font-bold underline">
+                    Privacy Policy{" "}
+                  </Link>
+                  {errors.terms && (
+                    <span className="block text-destructive mt-1 font-medium">
+                      {errors.terms}
+                    </span>
+                  )}
+                </label>
+              </div>
+            </div>
+
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground text-base font-semibold rounded-lg disabled:bg-neutral-400 disabled:opacity-100 disabled:cursor-not-allowed"
+            >
+              {loading ? (
+                <div className="flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 bg-current rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                  <span className="w-1.5 h-1.5 bg-current rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                  <span className="w-1.5 h-1.5 bg-current rounded-full animate-bounce"></span>
+                </div>
+              ) : (
+                "Agree and continue"
+              )}
+            </Button>
+          </form>
         </div>
       </div>
     </div>
   );
 }
+
 

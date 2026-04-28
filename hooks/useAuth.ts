@@ -7,9 +7,8 @@ export function useAuth() {
   const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
-    // Check for token on mount and when it changes
     const currentToken = getCookie("access_token");
-    setToken(currentToken);
+    setToken(currentToken ?? null);
   }, []);
 
   const userQuery = useQuery({
@@ -22,18 +21,24 @@ export function useAuth() {
   const loginMutation = useMutation({
     mutationFn: login,
     onSuccess: (data) => {
-      queryClient.setQueryData(["me"], data.user);
-      setToken(data.access_token || getCookie("access_token"));
-      window.location.href = "/";
+      // Only store the token the server just issued — never fall back to an old one
+      const resolvedToken = data.access_token ?? null;
+      setToken(resolvedToken);
+      queryClient.setQueryData(["me"], data.user ?? null);
+      if (resolvedToken) {
+        queryClient.invalidateQueries({ queryKey: ["me"] });
+      }
     },
   });
 
+  // Register does NOT redirect — the onboarding flow controls the next step
   const registerMutation = useMutation({
     mutationFn: register,
     onSuccess: (data) => {
+      const resolvedToken =
+        data.access_token || data.token || getCookie("access_token");
+      setToken(resolvedToken ?? null);
       queryClient.setQueryData(["me"], data.user);
-      setToken(data.token || getCookie("access_token"));
-      window.location.href = "/";
     },
   });
 
@@ -49,11 +54,16 @@ export function useAuth() {
     user: userQuery.data,
     isLoading: userQuery.isLoading && !!token,
     isLoggedIn: !!token,
+    // Expose mutate (fire-and-forget with optional callbacks) and mutateAsync (awaitable)
     login: loginMutation.mutate,
+    loginAsync: loginMutation.mutateAsync,
     isLoggingIn: loginMutation.isPending,
+    loginError: loginMutation.error,
     register: registerMutation.mutate,
+    registerAsync: registerMutation.mutateAsync,
     isRegistering: registerMutation.isPending,
+    registerError: registerMutation.error,
     logout: handleLogout,
-    error: userQuery.error || loginMutation.error || registerMutation.error,
+    error: userQuery.error,
   };
 }
