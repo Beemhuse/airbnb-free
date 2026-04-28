@@ -45,7 +45,7 @@ A modern, high-performance Airbnb clone built with Next.js, featuring a robust o
    Create a `.env.local` file in the root directory:
 
    ```env
-   NEXT_PUBLIC_API_URL=[http://localhost:3005](https://airbnb-server-keek.onrender.com)
+   NEXT_PUBLIC_API_URL=(https://airbnb-server-keek.onrender.com)
    ```
 
 4. **Launch the development server**:
