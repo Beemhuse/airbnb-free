@@ -95,7 +95,7 @@ export default function Navbar() {
                 {isLoggedIn ? (
                   <>
                     <Image
-                      src={user?.avatar || "/avatar.png"}
+                      src={user?.profilePhoto || "/avatar.png"}
                       alt="User"
                       width={30}
                       height={30}

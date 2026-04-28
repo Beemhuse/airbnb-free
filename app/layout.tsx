@@ -40,9 +40,10 @@ export default function RootLayout({
         <QueryProvider>
           {children}
           <Toaster />
+          <Footer />
           {process.env.NODE_ENV === 'production' && <Analytics />}
         </QueryProvider>
-        <Footer />
+
       </body>
     </html>
   )
