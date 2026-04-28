@@ -13,8 +13,8 @@ export default function Footer() {
 
   if (!showStandardFooter) {
     return (
-      <footer className="w-full   bg-[#222222] text-white">
-        <div className="max-w-[2520px] mx-auto px-4 sm:px-8 py-4 flex items-center justify-between">
+      <footer className="w-full bg-[#222222] text-white">
+        <div className="max-w-[2520px] mx-auto px-4 sm:px-8 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <div className="bg-[#FF385C] p-1.5 rounded-lg">
               <Image
@@ -25,12 +25,13 @@ export default function Footer() {
                 className="brightness-0 invert"
               />
             </div>
-            <span className="font-semibold text-2xl">Airbnb</span>
+            <span className="font-semibold text-xl md:text-2xl">Airbnb</span>
           </div>
-          <div className="flex items-center gap-2 text-3xl text-white">
-            <span>curated by</span>
-            <Image src="/mobbin.png" alt="Airbnb" width={100} height={50} />
-            {/* <span className="font-bold text-white text-base">Mobbin</span> */}
+          <div className="flex items-center gap-2 text-xl md:text-3xl text-white">
+            <span className="text-sm md:text-xl text-neutral-400">curated by</span>
+            <div className="relative w-[80px] h-[40px] md:w-[100px] md:h-[50px]">
+              <Image src="/mobbin.png" alt="Mobbin" fill className="object-contain" />
+            </div>
           </div>
         </div>
       </footer>
@@ -39,9 +40,9 @@ export default function Footer() {
 
   return (
     <footer className="w-full border-t bg-white">
-      <div className="max-w-[1600px] flex justify-between mx-auto px-6 py-4 ">
+      <div className="max-w-[1600px] flex flex-col lg:flex-row justify-between items-center mx-auto px-6 py-4 gap-4">
         {/* LEFT SIDE */}
-        <div className="flex items-center gap-4 text-sm text-neutral-600">
+        <div className="flex flex-wrap justify-center items-center gap-x-4 gap-y-2 text-sm text-neutral-600">
           <span>© 2022 Airbnb, Inc.</span>
           <span className="hover:underline cursor-pointer">Privacy</span>
           <span className="hover:underline cursor-pointer">Terms</span>
@@ -49,7 +50,7 @@ export default function Footer() {
         </div>
 
         {/* RIGHT SIDE */}
-        <div className="flex items-center gap-6 text-sm text-neutral-700">
+        <div className="flex flex-wrap justify-center items-center gap-x-6 gap-y-2 text-sm text-neutral-700">
           <div className="flex items-center gap-1 cursor-pointer hover:underline">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -79,14 +80,11 @@ export default function Footer() {
             USD
           </div>
           <div className="cursor-pointer flex items-center gap-2 hover:underline">
-            <span className="flex items-center gap-1">
-              Support & resources{" "}
-            </span>
-
+            <span className="flex items-center gap-1">Support & resources</span>
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
+              width="20"
+              height="20"
               viewBox="0 0 24 24"
             >
               <path
@@ -101,25 +99,27 @@ export default function Footer() {
           </div>
         </div>
       </div>
-      <div className="max-w-[2520px] w-full   bg-[#222222] text-white mx-auto px-4 sm:px-8 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="bg-[#FF385C] p-1.5 rounded-lg">
-            <Image
-              src="/airbnb-logo.png"
-              alt="Airbnb"
-              width={20}
-              height={20}
-              className="brightness-0 invert"
-            />
+       <div className="max-w-[2520px] bg-[#222222] text-white mx-auto px-4 sm:px-8 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <div className="bg-[#FF385C] p-1.5 rounded-lg">
+              <Image
+                src="/airbnb-logo.png"
+                alt="Airbnb"
+                width={20}
+                height={20}
+                className="brightness-0 invert"
+              />
+            </div>
+            <span className="font-semibold text-xl md:text-2xl">Airbnb</span>
           </div>
-          <span className="font-semibold text-2xl">Airbnb</span>
+          <div className="flex items-center gap-2 text-xl md:text-3xl text-white">
+            <span className="text-sm md:text-xl text-neutral-400">curated by</span>
+            <div className="relative w-[80px] h-[40px] md:w-[100px] md:h-[50px]">
+              <Image src="/mobbin.png" alt="Mobbin" fill className="object-contain" />
+            </div>
+          </div>
         </div>
-        <div className="flex items-center gap-2 text-3xl text-white">
-          <span>curated by</span>
-          <Image src="/mobbin.png" alt="Airbnb" width={100} height={50} />
-          {/* <span className="font-bold text-white text-base">Mobbin</span> */}
-        </div>
-      </div>
     </footer>
   );
 }
+
