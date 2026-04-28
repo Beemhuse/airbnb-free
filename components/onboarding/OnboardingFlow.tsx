@@ -1,10 +1,9 @@
 'use client';
+
 import { useOnboarding } from '@/hooks/useOnboarding';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { sendOtp, verifyOtp, uploadAvatar } from '@/lib/api';
-
-
 
 import { InitialLoginScreen } from './screens/InitialLoginScreen';
 import { LoginPasswordScreen } from './screens/LoginPasswordScreen';
@@ -13,16 +12,14 @@ import { ProfileSetupScreen } from './screens/ProfileSetupScreen';
 import { CommunityCommitmentModal } from './screens/CommunityCommitmentModal';
 import { ProfilePhotoScreen } from './screens/ProfilePhotoScreen';
 import { PhoneEntryScreen } from './screens/PhoneEntryScreen';
-
 import { WelcomeScreen } from './screens/WelcomeScreen';
-
 
 interface OnboardingFlowProps {
   onClose?: () => void;
 }
 
 export function OnboardingFlow({ onClose }: OnboardingFlowProps) {
-  const { login, register } = useAuth();
+  const { loginAsync, registerAsync } = useAuth();
   const { toast } = useToast();
   const {
     currentStep,
@@ -33,67 +30,63 @@ export function OnboardingFlow({ onClose }: OnboardingFlowProps) {
     goToStep,
   } = useOnboarding();
 
-
-  const handleInitialLoginContinue = async (
+  // Step 1: Email/phone entry — just store data and move on
+  const handleInitialLoginContinue = (
     emailOrPhone: string,
     country: string,
     phone?: string
   ) => {
-    const email = phone ? '' : emailOrPhone;
     updateFormData({
-      email,
+      email: phone ? '' : emailOrPhone,
       phone: phone || emailOrPhone,
       country,
     });
-    
-    // Default to profile setup as checkUser is disabled
     goToStep('profile-setup');
   };
 
-
+  // Login flow (existing user)
   const handleLoginPassword = async (password: string) => {
     const identifier = formData.phone || formData.email;
     const isEmail = identifier.includes('@');
-    
-    login({
-      [isEmail ? 'email' : 'phone']: identifier,
-      password,
-    }, {
-      onSuccess: () => {
-        toast({
-          title: "Welcome back!",
-          description: "Login successful.",
-        });
-      },
-      onError: (error: unknown) => {
-        toast({
-          title: "Login failed",
-          description: error instanceof Error ? error.message : "Please check your credentials.",
-          variant: "destructive",
-        });
-      }
-    });
-  };
 
-
-  const handlePhoneConfirmation = async (code: string) => {
     try {
-      await verifyOtp(formData.email, code);
-      toast({
-        title: "Verified",
-        description: "Your phone number has been confirmed.",
+      await loginAsync({
+        [isEmail ? 'email' : 'phone']: identifier,
+        password,
       });
-      goToStep('profile-photo');
-    } catch (error: unknown) {
       toast({
-        title: "Verification failed",
-        description: error instanceof Error ? error.message : "Invalid code.",
-        variant: "destructive",
+        title: 'Welcome back!',
+        description: 'You have successfully logged in.',
+      });
+      window.location.href = '/';
+    } catch (err: unknown) {
+      toast({
+        title: 'Login failed',
+        description: err instanceof Error ? err.message : 'Please check your credentials.',
+        variant: 'destructive',
       });
     }
   };
 
+  // OTP verification
+  const handlePhoneConfirmation = async (code: string) => {
+    try {
+      await verifyOtp(formData.email, code);
+      toast({
+        title: 'Verified!',
+        description: 'Your phone number has been confirmed.',
+      });
+      goToStep('profile-photo');
+    } catch (err: unknown) {
+      toast({
+        title: 'Verification failed',
+        description: err instanceof Error ? err.message : 'Invalid OTP code. Please try again.',
+        variant: 'destructive',
+      });
+    }
+  };
 
+  // Registration (new user profile)
   const handleProfileSetup = async (data: {
     firstName: string;
     lastName: string;
@@ -102,39 +95,37 @@ export function OnboardingFlow({ onClose }: OnboardingFlowProps) {
     password: string;
   }) => {
     updateFormData(data);
-    register(data, {
-      onSuccess: () => {
-        toast({
-          title: "Account created",
-          description: "Welcome to Airbnb!",
-        });
-        setShowCommunityModal(true);
-      },
-      onError: (error: unknown) => {
-        toast({
-          title: "Registration failed",
-          description: error instanceof Error ? error.message : "Something went wrong.",
-          variant: "destructive",
-        });
-      }
-    });
+    try {
+      await registerAsync(data);
+      toast({
+        title: 'Account created!',
+        description: 'Welcome to Airbnb.',
+      });
+      setShowCommunityModal(true);
+    } catch (err: unknown) {
+      toast({
+        title: 'Registration failed',
+        description: err instanceof Error ? err.message : 'Something went wrong. Please try again.',
+        variant: 'destructive',
+      });
+    }
   };
 
-
+  // OTP send
   const handlePhoneEntry = async (phone: string, country: string) => {
     try {
       updateFormData({ phone, country });
       await sendOtp(formData.email);
       toast({
-        title: "OTP Sent",
-        description: "Please check your messages for the code.",
+        title: 'OTP Sent',
+        description: 'Please check your messages for the verification code.',
       });
       goToStep('phone-confirmation');
-    } catch (error: unknown) {
+    } catch (err: unknown) {
       toast({
-        title: "Failed to send OTP",
-        description: error instanceof Error ? error.message : "Try again later.",
-        variant: "destructive",
+        title: 'Failed to send OTP',
+        description: err instanceof Error ? err.message : 'Try again later.',
+        variant: 'destructive',
       });
     }
   };
@@ -143,8 +134,8 @@ export function OnboardingFlow({ onClose }: OnboardingFlowProps) {
     updateFormData({ agreedToCommunity: true });
     setShowCommunityModal(false);
     toast({
-      title: "Agreement signed",
-      description: "Thank you for joining our community.",
+      title: 'Community commitment accepted',
+      description: 'Thank you for joining our community.',
     });
     goToStep('welcome');
   };
@@ -158,37 +149,32 @@ export function OnboardingFlow({ onClose }: OnboardingFlowProps) {
     goToStep('phone-entry');
   };
 
-
-
+  // Profile photo upload (optional)
   const handleProfilePhotoComplete = async (photo?: File | null) => {
     if (photo) {
       try {
         await uploadAvatar(photo, formData.email);
         updateFormData({ profilePhoto: photo });
-        
         toast({
-          title: "Photo uploaded",
-          description: "Your profile photo has been updated.",
+          title: 'Photo uploaded',
+          description: 'Your profile photo has been saved.',
         });
-
         const reader = new FileReader();
         reader.onloadend = () => {
           localStorage.setItem('userAvatar', reader.result as string);
           window.dispatchEvent(new Event('storage'));
         };
         reader.readAsDataURL(photo);
-      } catch (error: unknown) {
+      } catch (err: unknown) {
         toast({
-          title: "Upload failed",
-          description: error instanceof Error ? error.message : "Could not upload profile photo.",
-          variant: "destructive",
+          title: 'Upload failed',
+          description: err instanceof Error ? err.message : 'Could not upload profile photo.',
+          variant: 'destructive',
         });
       }
     }
-    
     window.location.href = '/';
   };
-
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-neutral-50 to-white flex items-center justify-center p-4">
@@ -204,13 +190,13 @@ export function OnboardingFlow({ onClose }: OnboardingFlowProps) {
         />
       )}
 
-
-      {currentStep === 'phone-confirmation' && (
-        <PhoneConfirmationScreen
-          phoneNumber={formData.phone}
-          onContinue={handlePhoneConfirmation}
+      {currentStep === 'login-password' && (
+        <LoginPasswordScreen
+          identifier={formData.phone || formData.email}
+          onContinue={handleLoginPassword}
           onBack={() => goToStep('login')}
-          isOpen={currentStep === 'phone-confirmation'}
+          onClose={onClose}
+          isOpen={currentStep === 'login-password'}
         />
       )}
 
@@ -230,12 +216,21 @@ export function OnboardingFlow({ onClose }: OnboardingFlowProps) {
       {currentStep === 'phone-entry' && (
         <PhoneEntryScreen
           onContinue={handlePhoneEntry}
-          onBack={() => goToStep('profile-setup')}
+          onBack={() => goToStep('welcome')}
           isOpen={currentStep === 'phone-entry'}
           initialData={{
             phone: formData.phone,
             country: formData.country,
           }}
+        />
+      )}
+
+      {currentStep === 'phone-confirmation' && (
+        <PhoneConfirmationScreen
+          phoneNumber={formData.phone}
+          onContinue={handlePhoneConfirmation}
+          onBack={() => goToStep('phone-entry')}
+          isOpen={currentStep === 'phone-confirmation'}
         />
       )}
 
@@ -253,19 +248,7 @@ export function OnboardingFlow({ onClose }: OnboardingFlowProps) {
         />
       )}
 
-      {currentStep === 'login-password' && (
-        <LoginPasswordScreen
-          identifier={formData.phone || formData.email}
-          onContinue={handleLoginPassword}
-          onBack={() => goToStep('login')}
-          onClose={onClose}
-          isOpen={currentStep === 'login-password'}
-        />
-      )}
-
-
       {currentStep === 'profile-photo' && (
-
         <ProfilePhotoScreen
           onContinue={handleProfilePhotoComplete}
           onBack={() => goToStep('profile-setup')}
@@ -274,5 +257,3 @@ export function OnboardingFlow({ onClose }: OnboardingFlowProps) {
     </div>
   );
 }
-
-

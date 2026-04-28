@@ -18,24 +18,29 @@ export function LoginScreen({ onClose, onSuccess }: LoginScreenProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const { login, isLoggingIn, error: authError } = useAuth();
+  const { loginAsync, isLoggingIn, loginError } = useAuth();
   const { toast } = useToast();
 
   const handleLogin = async () => {
     if (!email || !password) return;
     
-    login({ email, password }, {
-      onSuccess: () => {
-        toast({
-          title: "Welcome back!",
-          description: "You have successfully logged in.",
-        });
-        if (onSuccess) {
-          onSuccess();
-        }
-      },
-    });
+    try {
+      await loginAsync({ email, password });
+      toast({
+        title: "Welcome back!",
+        description: "You have successfully logged in.",
+      });
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        // window.location.href = "/";
+      }
+    } catch (err: unknown) {
+     // eslint-disable-next-line no-console
+     console.error(err)
+    }
   };
+
 
 
   return (
@@ -91,9 +96,10 @@ export function LoginScreen({ onClose, onSuccess }: LoginScreenProps) {
               </div>
             </div>
 
-            {authError && (
-              <p className="text-destructive text-sm mb-4">{authError instanceof Error ? authError.message : "Login failed"}</p>
+            {loginError && (
+              <p className="text-destructive text-sm mb-4">{loginError instanceof Error ? loginError.message : "Login failed"}</p>
             )}
+
 
             <Button
               type="submit"

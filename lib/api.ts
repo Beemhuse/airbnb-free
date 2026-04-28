@@ -19,6 +19,18 @@ function deleteCookie(name: string) {
   document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
 }
 
+/** Parses both {message: "..."} and {error: "..."} response shapes */
+async function parseErrorMessage(response: Response, fallback: string): Promise<string> {
+  try {
+    const body = await response.json();
+    // Handle arrays (e.g. NestJS validation errors)
+    if (Array.isArray(body?.message)) return body.message.join(", ");
+    return body?.message || body?.error || fallback;
+  } catch {
+    return fallback;
+  }
+}
+
 async function apiFetch(endpoint: string, options: RequestInit = {}) {
   const token = getCookie("access_token");
 
@@ -44,16 +56,14 @@ export async function fetchListings(category?: string) {
   return response.json();
 }
 
-
-
 export async function sendOtp(email: string) {
   const response = await apiFetch(`${API_URL}/auth/send-otp`, {
     method: "POST",
     body: JSON.stringify({ email }),
   });
   if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || "Failed to send OTP");
+    const message = await parseErrorMessage(response, "Failed to send OTP");
+    throw new Error(message);
   }
   return response.json();
 }
@@ -64,8 +74,8 @@ export async function verifyOtp(email: string, otp: string) {
     body: JSON.stringify({ email, otp }),
   });
   if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || "Invalid OTP");
+    const message = await parseErrorMessage(response, "Invalid OTP code");
+    throw new Error(message);
   }
   return response.json();
 }
@@ -81,7 +91,8 @@ export async function onboardUser(data: {
     body: JSON.stringify(data),
   });
   if (!response.ok) {
-    throw new Error("Failed to onboard user");
+    const message = await parseErrorMessage(response, "Failed to onboard user");
+    throw new Error(message);
   }
   return response.json();
 }
@@ -95,17 +106,26 @@ export async function login(credentials: {
     method: "POST",
     body: JSON.stringify(credentials),
   });
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || "Login failed");
-  }
-  const data = await response.json();
-  if (data.access_token) {
 
+  // Handle explicit HTTP error status codes
+  if (!response.ok) {
+    const message = await parseErrorMessage(response, "Login failed");
+    throw new Error(message);
+  }
+
+  const data = await response.json();
+
+  // Handle backends that return 200 OK with {error: "..."} instead of a 4xx status
+  if (!data.access_token && (data.error || data.message?.includes?.("Invalid"))) {
+    throw new Error(data.error || data.message || "Invalid credentials");
+  }
+
+  if (data.access_token) {
     setCookie("access_token", data.access_token, 7);
   }
   return data;
 }
+
 
 export async function register(userData: {
   firstName: string;
@@ -121,19 +141,20 @@ export async function register(userData: {
     body: JSON.stringify(userData),
   });
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || "Registration failed");
+    const message = await parseErrorMessage(response, "Registration failed");
+    throw new Error(message);
   }
   const data = await response.json();
-  if (data.token) {
-    setCookie("access_token", data.token, 7);
+  // Some backends return token, others access_token
+  const token = data.access_token || data.token;
+  if (token) {
+    setCookie("access_token", token, 7);
   }
   return data;
 }
 
 export function logout() {
   deleteCookie("access_token");
-
   localStorage.removeItem("userAvatar");
 }
 
@@ -146,7 +167,6 @@ export async function fetchMe() {
 }
 
 export async function uploadAvatar(file: File, email: string) {
-
   const formData = new FormData();
   formData.append("file", file);
   formData.append("email", email);
@@ -162,7 +182,8 @@ export async function uploadAvatar(file: File, email: string) {
   });
 
   if (!response.ok) {
-    throw new Error("Failed to upload avatar");
+    const message = await parseErrorMessage(response, "Failed to upload avatar");
+    throw new Error(message);
   }
   return response.json();
 }
