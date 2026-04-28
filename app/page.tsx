@@ -10,7 +10,6 @@ import { useSearchParams } from "next/navigation";
 import { Map } from "lucide-react";
 import { useState } from "react";
 
-
 interface Listing {
   _id: string;
   location: string;
@@ -30,10 +29,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-white">
-      <Navbar
-        onLogin={() => setShowOnboarding(true)}
-        onSignup={() => setShowOnboarding(true)}
-      />
+      <Navbar />
       {showOnboarding && (
         <OnboardingFlow onClose={() => setShowOnboarding(false)} />
       )}

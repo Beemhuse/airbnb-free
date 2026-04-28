@@ -1,35 +1,96 @@
-# airbnb-free
+# Airbnb Clone - Frontend
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [v0](https://v0.app).
+A modern, high-performance Airbnb clone built with Next.js, featuring a robust onboarding flow, secure cookie-based authentication, and dynamic listing management.
 
-## Built with v0
+## 🚀 Features
 
-This repository is linked to a [v0](https://v0.app) project. You can continue developing by visiting the link below -- start new chats to make changes, and v0 will push commits directly to this repo. Every merge to `main` will automatically deploy.
+- **Onboarding Flow**: Multi-step registration wizard including profile setup, community commitment, and phone verification.
+- **Secure Authentication**: Cookie-based session persistence with `access_token` and a dedicated `/me` endpoint for real-time user hydration.
+- **Dynamic Listings**: Category-based filtering and listing discovery powered by TanStack React Query.
+- **State Management**: Centralized data fetching and caching using TanStack React Query for smooth, zero-latency interactions.
+- **Premium UI**: Styled with Tailwind CSS, featuring glassmorphism, smooth transitions, and conditional footers.
 
-[Continue working on v0 →](https://v0.app/chat/projects/prj_TeoRg37HVMdEQXfxjtBXcmayak3q)
+## 🛠️ Tech Stack
 
-## Getting Started
+- **Framework**: Next.js (App Router)
+- **Styling**: Tailwind CSS
+- **Icons**: Lucide React
+- **Data Fetching**: TanStack React Query
+- **State/Auth**: Custom `useAuth` and `useCrud` hooks
+- **API Client**: Standard `fetch` with centralized `apiFetch` wrapper
 
-First, run the development server:
+## 🏃 Getting Started
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
+### Prerequisites
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- Node.js 18+
+- pnpm (recommended) or npm/yarn
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Local Development
 
-## Learn More
+1. **Clone the repository**:
 
-To learn more, take a look at the following resources:
+   ```bash
+   git clone <repository-url>
+   cd airbnb-free
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-- [v0 Documentation](https://v0.app/docs) - learn about v0 and how to use it.
+2. **Install dependencies**:
 
-<a href="https://v0.app/chat/api/kiro/clone/Beemhuse/airbnb-free" alt="Open in Kiro"><img src="https://pdgvvgmkdvyeydso.public.blob.vercel-storage.com/open%20in%20kiro.svg?sanitize=true" /></a>
+   ```bash
+   pnpm install
+   ```
+
+3. **Configure Environment Variables**:
+   Create a `.env.local` file in the root directory:
+
+   ```env
+   NEXT_PUBLIC_API_URL=http://localhost:3005
+   ```
+
+4. **Launch the development server**:
+   ```bash
+   pnpm dev
+   ```
+   The app will be available at `http://localhost:3000`.
+
+### Production Deployment
+
+1. **Build the application**:
+
+   ```bash
+   pnpm build
+   ```
+
+2. **Start the production server**:
+   ```bash
+   pnpm start
+   ```
+
+## 📡 API Architecture
+
+The frontend communicates with a backend service (defaulting to port 3005). Authentication is handled via Bearer tokens stored in the `access_token` cookie.
+
+### Key Endpoints
+
+| Category       | Endpoint           | Method | Description                                     |
+| :------------- | :----------------- | :----- | :---------------------------------------------- |
+| **Auth**       | `/auth/login`      | POST   | Authenticate user and receive access token.     |
+| **Auth**       | `/auth/register`   | POST   | Create a new user account.                      |
+| **Auth**       | `/auth/me`         | GET    | Retrieve current user profile (requires token). |
+| **Auth**       | `/auth/check-user` | POST   | Check if an email/phone already exists.         |
+| **Onboarding** | `/auth/send-otp`   | POST   | Send verification code to user email/phone.     |
+| **Onboarding** | `/auth/verify-otp` | POST   | Verify the OTP code provided by user.           |
+| **Listings**   | `/listings`        | GET    | Fetch all listings or filter by category.       |
+
+## 🏗️ Project Structure
+
+- `app/`: Next.js pages and layouts.
+- `components/`: Reusable UI components, including the `onboarding` flow.
+- `hooks/`: Custom React Query hooks (`useAuth`, `useListings`, `useCrud`).
+- `lib/`: Utility functions and API client (`api.ts`).
+- `public/`: Static assets and logos.
+
+---
+
+_Created with ❤️ for the Airbnb community._
