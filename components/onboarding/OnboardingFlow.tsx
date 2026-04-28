@@ -1,7 +1,9 @@
 'use client';
 import { useOnboarding } from '@/hooks/useOnboarding';
 import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
 import { sendOtp, verifyOtp, uploadAvatar, checkUser } from '@/lib/api';
+
 
 
 import { InitialLoginScreen } from './screens/InitialLoginScreen';
@@ -21,9 +23,8 @@ interface OnboardingFlowProps {
 
 export function OnboardingFlow({ onClose }: OnboardingFlowProps) {
   const { login, register } = useAuth();
+  const { toast } = useToast();
   const {
-
-
     currentStep,
     formData,
     showCommunityModal,
@@ -52,9 +53,12 @@ export function OnboardingFlow({ onClose }: OnboardingFlowProps) {
       } else {
         goToStep('profile-setup');
       }
-    } catch {
-      // If check fails, default to registration or show error?
-      // For now, let's just go to profile-setup if it fails
+    } catch (error: unknown) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to check user",
+        variant: "destructive",
+      });
       goToStep('profile-setup');
     }
 
@@ -67,13 +71,39 @@ export function OnboardingFlow({ onClose }: OnboardingFlowProps) {
     login({
       [isEmail ? 'email' : 'phone']: identifier,
       password,
+    }, {
+      onSuccess: () => {
+        toast({
+          title: "Welcome back!",
+          description: "Login successful.",
+        });
+      },
+      onError: (error: unknown) => {
+        toast({
+          title: "Login failed",
+          description: error instanceof Error ? error.message : "Please check your credentials.",
+          variant: "destructive",
+        });
+      }
     });
   };
 
 
   const handlePhoneConfirmation = async (code: string) => {
-    await verifyOtp(formData.email, code);
-    goToStep('profile-photo');
+    try {
+      await verifyOtp(formData.email, code);
+      toast({
+        title: "Verified",
+        description: "Your phone number has been confirmed.",
+      });
+      goToStep('profile-photo');
+    } catch (error: unknown) {
+      toast({
+        title: "Verification failed",
+        description: error instanceof Error ? error.message : "Invalid code.",
+        variant: "destructive",
+      });
+    }
   };
 
 
@@ -85,24 +115,50 @@ export function OnboardingFlow({ onClose }: OnboardingFlowProps) {
     password: string;
   }) => {
     updateFormData(data);
-    // Register the user here
     register(data, {
       onSuccess: () => {
+        toast({
+          title: "Account created",
+          description: "Welcome to Airbnb!",
+        });
         setShowCommunityModal(true);
+      },
+      onError: (error: unknown) => {
+        toast({
+          title: "Registration failed",
+          description: error instanceof Error ? error.message : "Something went wrong.",
+          variant: "destructive",
+        });
       }
     });
   };
 
 
   const handlePhoneEntry = async (phone: string, country: string) => {
-    updateFormData({ phone, country });
-    await sendOtp(formData.email);
-    goToStep('phone-confirmation');
+    try {
+      updateFormData({ phone, country });
+      await sendOtp(formData.email);
+      toast({
+        title: "OTP Sent",
+        description: "Please check your messages for the code.",
+      });
+      goToStep('phone-confirmation');
+    } catch (error: unknown) {
+      toast({
+        title: "Failed to send OTP",
+        description: error instanceof Error ? error.message : "Try again later.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleCommunityAgree = () => {
     updateFormData({ agreedToCommunity: true });
     setShowCommunityModal(false);
+    toast({
+      title: "Agreement signed",
+      description: "Thank you for joining our community.",
+    });
     goToStep('welcome');
   };
 
@@ -123,24 +179,29 @@ export function OnboardingFlow({ onClose }: OnboardingFlowProps) {
         await uploadAvatar(photo, formData.email);
         updateFormData({ profilePhoto: photo });
         
-        // Save avatar URL to localStorage for the Navbar to pick up
+        toast({
+          title: "Photo uploaded",
+          description: "Your profile photo has been updated.",
+        });
+
         const reader = new FileReader();
         reader.onloadend = () => {
           localStorage.setItem('userAvatar', reader.result as string);
-          window.dispatchEvent(new Event('storage')); // Trigger update in other components
+          window.dispatchEvent(new Event('storage'));
         };
         reader.readAsDataURL(photo);
-      } catch {
-        // Error is handled by the caller or ignored if it's just an avatar upload
+      } catch (error: unknown) {
+        toast({
+          title: "Upload failed",
+          description: error instanceof Error ? error.message : "Could not upload profile photo.",
+          variant: "destructive",
+        });
       }
-
-
-
     }
     
-    // Redirect to home or sign-in as requested
     window.location.href = '/';
   };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-neutral-50 to-white flex items-center justify-center p-4">
