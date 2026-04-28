@@ -5,6 +5,8 @@ type Props = {
   label: string;
   containerClassName?: string;
   inputClassName?: string;
+  error?: boolean;
+  errorMessage?: string;
 } & InputHTMLAttributes<HTMLInputElement>;
 
 export default function FloatingInput({
@@ -14,6 +16,8 @@ export default function FloatingInput({
   value = "",
   onChange,
   type = "text",
+  error,
+  errorMessage,
   ...props
 }: Props) {
   const [focused, setFocused] = useState(false);
@@ -23,8 +27,11 @@ export default function FloatingInput({
   return (
     <div
       className={clsx(
-        "relative border border-neutral-300 rounded-lg px-3 pt-5 pb-2 transition-all",
-        focused && "border-neutral-500",
+        "relative rounded-lg border transition-all px-3 pt-6 pb-2",
+        "border-input bg-transparent",
+        focused && "ring-[3px] ring-ring/50 border-ring",
+        (error || errorMessage) && "border-destructive ring-destructive/20",
+        "dark:bg-input/30",
         containerClassName
       )}
     >
@@ -33,8 +40,8 @@ export default function FloatingInput({
         className={clsx(
           "absolute left-3 transition-all duration-200 pointer-events-none",
           isActive
-            ? "top-1 text-xs text-neutral-500"
-            : "top-3 text-base text-neutral-400"
+            ? "top-1 text-xs text-muted-foreground"
+            : "top-3 text-base text-muted-foreground"
         )}
       >
         {label}
@@ -48,11 +55,21 @@ export default function FloatingInput({
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         className={clsx(
-          "w-full bg-transparent outline-none text-base pt-2",
+          "file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground",
+          "w-full min-w-0 bg-transparent text-base outline-none",
+          "disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
+          "md:text-sm",
+          "p-0",
+
           inputClassName
         )}
         {...props}
       />
+      {errorMessage && (
+        <p className="absolute left-0 -bottom-5 text-[10px] text-destructive animate-in fade-in slide-in-from-top-1">
+          {errorMessage}
+        </p>
+      )}
     </div>
   );
 }

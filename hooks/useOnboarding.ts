@@ -14,14 +14,19 @@ export interface OnboardingFormData {
 
 export type OnboardingStep = 
   | 'login' 
-  | 'phone-confirmation' 
+  | 'login-password'
   | 'profile-setup' 
-  | 'community-commitment' 
+  | 'phone-entry'
+  | 'phone-confirmation' 
+  | 'welcome'
   | 'profile-photo' 
   | 'complete';
 
-export function useOnboarding() {
-  const [currentStep, setCurrentStep] = useState<OnboardingStep>('login');
+
+
+export function useOnboarding(initialStep: OnboardingStep = 'login') {
+  const [currentStep, setCurrentStep] = useState<OnboardingStep>(initialStep);
+
   const [showCommunityModal, setShowCommunityModal] = useState(false);
   const [formData, setFormData] = useState<OnboardingFormData>({
     email: '',
@@ -46,9 +51,9 @@ export function useOnboarding() {
   const nextStep = () => {
     const steps: OnboardingStep[] = [
       'login',
-      'phone-confirmation',
       'profile-setup',
-      'community-commitment',
+      'phone-entry',
+      'phone-confirmation',
       'profile-photo',
       'complete',
     ];
@@ -61,9 +66,9 @@ export function useOnboarding() {
   const previousStep = () => {
     const steps: OnboardingStep[] = [
       'login',
-      'phone-confirmation',
       'profile-setup',
-      'community-commitment',
+      'phone-entry',
+      'phone-confirmation',
       'profile-photo',
       'complete',
     ];
