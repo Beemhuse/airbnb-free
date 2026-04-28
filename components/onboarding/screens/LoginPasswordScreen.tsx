@@ -62,44 +62,53 @@ export function LoginPasswordScreen({
         </p>
       </div>
 
-      <div className="space-y-4 mb-8">
-        <div className="relative">
-          <FloatingInput
-            label="Password"
-            type={showPassword ? 'text' : 'password'}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            autoComplete="current-password"
-          />
-          <button
-            type="button"
-            onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-semibold underline text-neutral-900"
-          >
-            {showPassword ? 'Hide' : 'Show'}
-          </button>
-        </div>
-      </div>
-
-      <Button
-        onClick={handleContinue}
-        disabled={loading || !password}
-        className={`w-full h-12 text-base font-semibold rounded-lg mb-4 ${
-          loading || !password
-            ? 'bg-neutral-400 text-white cursor-not-allowed'
-            : 'bg-primary hover:bg-primary/90 text-primary-foreground'
-        }`}
+      <form 
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleContinue();
+        }}
+        className="space-y-4"
       >
-        {loading ? (
-          <div className="flex items-center justify-center gap-1">
-            <span className="w-1.5 h-1.5 bg-current rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-            <span className="w-1.5 h-1.5 bg-current rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-            <span className="w-1.5 h-1.5 bg-current rounded-full animate-bounce"></span>
+        <div className="space-y-4 mb-8">
+          <div className="relative">
+            <FloatingInput
+              label="Password"
+              type={showPassword ? 'text' : 'password'}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="current-password"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-semibold underline text-neutral-900"
+            >
+              {showPassword ? 'Hide' : 'Show'}
+            </button>
           </div>
-        ) : (
-          'Log in'
-        )}
-      </Button>
+        </div>
+
+        <Button
+          type="submit"
+          disabled={loading || !password}
+          className={`w-full h-12 text-base font-semibold rounded-lg mb-4 ${
+            loading || !password
+              ? 'bg-neutral-400 text-white cursor-not-allowed'
+              : 'bg-primary hover:bg-primary/90 text-primary-foreground'
+          }`}
+        >
+          {loading ? (
+            <div className="flex items-center justify-center gap-1">
+              <span className="w-1.5 h-1.5 bg-current rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+              <span className="w-1.5 h-1.5 bg-current rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+              <span className="w-1.5 h-1.5 bg-current rounded-full animate-bounce"></span>
+            </div>
+          ) : (
+            'Log in'
+          )}
+        </Button>
+      </form>
+
 
       <div className="text-center">
         <button className="text-sm font-semibold underline text-neutral-900">
