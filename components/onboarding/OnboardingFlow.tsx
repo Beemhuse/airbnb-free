@@ -1,8 +1,11 @@
 'use client';
 import { useOnboarding } from '@/hooks/useOnboarding';
-import { register, sendOtp, verifyOtp, uploadAvatar } from '@/lib/api';
+import { useAuth } from '@/hooks/useAuth';
+import { sendOtp, verifyOtp, uploadAvatar, checkUser } from '@/lib/api';
+
 
 import { InitialLoginScreen } from './screens/InitialLoginScreen';
+import { LoginPasswordScreen } from './screens/LoginPasswordScreen';
 import { PhoneConfirmationScreen } from './screens/PhoneConfirmationScreen';
 import { ProfileSetupScreen } from './screens/ProfileSetupScreen';
 import { CommunityCommitmentModal } from './screens/CommunityCommitmentModal';
@@ -11,8 +14,16 @@ import { PhoneEntryScreen } from './screens/PhoneEntryScreen';
 
 import { WelcomeScreen } from './screens/WelcomeScreen';
 
-export function OnboardingFlow() {
+
+interface OnboardingFlowProps {
+  onClose?: () => void;
+}
+
+export function OnboardingFlow({ onClose }: OnboardingFlowProps) {
+  const { login, register } = useAuth();
   const {
+
+
     currentStep,
     formData,
     showCommunityModal,
@@ -33,10 +44,32 @@ export function OnboardingFlow() {
       phone: phone || emailOrPhone,
       country,
     });
-
     
-    goToStep('profile-setup');
+    try {
+      const { exists } = await checkUser(phone || emailOrPhone);
+      if (exists) {
+        goToStep('login-password');
+      } else {
+        goToStep('profile-setup');
+      }
+    } catch {
+      // If check fails, default to registration or show error?
+      // For now, let's just go to profile-setup if it fails
+      goToStep('profile-setup');
+    }
+
   };
+
+  const handleLoginPassword = async (password: string) => {
+    const identifier = formData.phone || formData.email;
+    const isEmail = identifier.includes('@');
+    
+    login({
+      [isEmail ? 'email' : 'phone']: identifier,
+      password,
+    });
+  };
+
 
   const handlePhoneConfirmation = async (code: string) => {
     await verifyOtp(formData.email, code);
@@ -53,19 +86,13 @@ export function OnboardingFlow() {
   }) => {
     updateFormData(data);
     // Register the user here
-    try {
-      await register(data);
-      setShowCommunityModal(true);
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        throw new Error('Registration failed', { cause: error });
+    register(data, {
+      onSuccess: () => {
+        setShowCommunityModal(true);
       }
-      throw new Error('Registration failed', { cause: error });
-    }
-
-
-
+    });
   };
+
 
   const handlePhoneEntry = async (phone: string, country: string) => {
     updateFormData({ phone, country });
@@ -120,6 +147,7 @@ export function OnboardingFlow() {
       {currentStep === 'login' && (
         <InitialLoginScreen
           onContinue={handleInitialLoginContinue}
+          onClose={onClose}
           initialData={{
             email: formData.email,
             country: formData.country,
@@ -127,6 +155,7 @@ export function OnboardingFlow() {
           }}
         />
       )}
+
 
       {currentStep === 'phone-confirmation' && (
         <PhoneConfirmationScreen
@@ -176,7 +205,19 @@ export function OnboardingFlow() {
         />
       )}
 
+      {currentStep === 'login-password' && (
+        <LoginPasswordScreen
+          identifier={formData.phone || formData.email}
+          onContinue={handleLoginPassword}
+          onBack={() => goToStep('login')}
+          onClose={onClose}
+          isOpen={currentStep === 'login-password'}
+        />
+      )}
+
+
       {currentStep === 'profile-photo' && (
+
         <ProfilePhotoScreen
           onContinue={handleProfilePhotoComplete}
           onBack={() => goToStep('profile-setup')}

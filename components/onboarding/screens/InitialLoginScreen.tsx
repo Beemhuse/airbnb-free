@@ -1,15 +1,15 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { FloatingCountrySelector } from "../CountrySelector";
-import { Mail } from "lucide-react";
+import { Mail, X } from "lucide-react";
 import FloatingInput from "@/components/ui/floating-input";
 import Link from "next/link";
 import clsx from "clsx";
 
 interface InitialLoginScreenProps {
-  // eslint-disable-next-line no-unused-vars
+   
   onContinue: (_email: string, _country: string, _phone?: string) => Promise<void>;
-
+  onClose?: () => void;
 
 
   initialData?: {
@@ -21,8 +21,10 @@ interface InitialLoginScreenProps {
 
 export function InitialLoginScreen({
   onContinue,
+  onClose,
   initialData,
 }: InitialLoginScreenProps) {
+
   const [usePhone, setUsePhone] = useState(false);
   const [email, setEmail] = useState(initialData?.email || "");
   const [country, setCountry] = useState(
@@ -63,10 +65,19 @@ export function InitialLoginScreen({
 
   return (
     <div className="w-full max-w-md mx-auto">
-      <div className="bg-white rounded-2xl border border-neutral-200 shadow-sm ">
+      <div className="bg-white rounded-2xl border border-neutral-200 shadow-sm relative">
+        {onClose && (
+          <button 
+            onClick={onClose}
+            className="absolute left-4 top-4 text-neutral-600 hover:text-black transition"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        )}
         <p className="text-sm text-black font-bold p-4 text-center border-b mb-4">
           Log in or sign up
         </p>
+
         <div className="p-8 pt-2">
           <h1 className="text-xl font-bold text-neutral-900 mb-6">
             Welcome to Airbnb

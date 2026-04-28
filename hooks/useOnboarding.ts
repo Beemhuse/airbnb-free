@@ -14,6 +14,7 @@ export interface OnboardingFormData {
 
 export type OnboardingStep = 
   | 'login' 
+  | 'login-password'
   | 'profile-setup' 
   | 'phone-entry'
   | 'phone-confirmation' 
@@ -22,8 +23,10 @@ export type OnboardingStep =
   | 'complete';
 
 
-export function useOnboarding() {
-  const [currentStep, setCurrentStep] = useState<OnboardingStep>('login');
+
+export function useOnboarding(initialStep: OnboardingStep = 'login') {
+  const [currentStep, setCurrentStep] = useState<OnboardingStep>(initialStep);
+
   const [showCommunityModal, setShowCommunityModal] = useState(false);
   const [formData, setFormData] = useState<OnboardingFormData>({
     email: '',

@@ -3,6 +3,7 @@ import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 import QueryProvider from '@/components/QueryProvider'
 import { Toaster } from '@/components/ui/toaster'
+import Footer from '@/components/Footer'
 
 
 export const metadata: Metadata = {
@@ -41,6 +42,7 @@ export default function RootLayout({
           <Toaster />
           {process.env.NODE_ENV === 'production' && <Analytics />}
         </QueryProvider>
+        <Footer />
       </body>
     </html>
   )
