@@ -1,12 +1,15 @@
 'use client';
-
-import React, { useEffect, useState } from 'react';
 import { useOnboarding } from '@/hooks/useOnboarding';
+import { register, sendOtp, verifyOtp, uploadAvatar } from '@/lib/api';
+
 import { InitialLoginScreen } from './screens/InitialLoginScreen';
 import { PhoneConfirmationScreen } from './screens/PhoneConfirmationScreen';
 import { ProfileSetupScreen } from './screens/ProfileSetupScreen';
 import { CommunityCommitmentModal } from './screens/CommunityCommitmentModal';
 import { ProfilePhotoScreen } from './screens/ProfilePhotoScreen';
+import { PhoneEntryScreen } from './screens/PhoneEntryScreen';
+
+import { WelcomeScreen } from './screens/WelcomeScreen';
 
 export function OnboardingFlow() {
   const {
@@ -16,33 +19,32 @@ export function OnboardingFlow() {
     setShowCommunityModal,
     updateFormData,
     goToStep,
-    nextStep,
-    previousStep,
   } = useOnboarding();
 
-  const [usePhoneAuth, setUsePhoneAuth] = useState(false);
 
-  const handleInitialLoginContinue = (
+  const handleInitialLoginContinue = async (
     emailOrPhone: string,
     country: string,
     phone?: string
   ) => {
+    const email = phone ? '' : emailOrPhone;
     updateFormData({
-      email: phone ? '' : emailOrPhone,
+      email,
       phone: phone || emailOrPhone,
       country,
     });
-    setUsePhoneAuth(!!phone);
-    goToStep('phone-confirmation');
-  };
 
-  const handlePhoneConfirmation = (code: string) => {
-    // In a real app, verify the code with a backend
-    console.log('OTP Code:', code);
+    
     goToStep('profile-setup');
   };
 
-  const handleProfileSetup = (data: {
+  const handlePhoneConfirmation = async (code: string) => {
+    await verifyOtp(formData.email, code);
+    goToStep('profile-photo');
+  };
+
+
+  const handleProfileSetup = async (data: {
     firstName: string;
     lastName: string;
     birthDate: string;
@@ -50,13 +52,31 @@ export function OnboardingFlow() {
     password: string;
   }) => {
     updateFormData(data);
-    setShowCommunityModal(true);
+    // Register the user here
+    try {
+      await register(data);
+      setShowCommunityModal(true);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        throw new Error('Registration failed', { cause: error });
+      }
+      throw new Error('Registration failed', { cause: error });
+    }
+
+
+
+  };
+
+  const handlePhoneEntry = async (phone: string, country: string) => {
+    updateFormData({ phone, country });
+    await sendOtp(formData.email);
+    goToStep('phone-confirmation');
   };
 
   const handleCommunityAgree = () => {
     updateFormData({ agreedToCommunity: true });
     setShowCommunityModal(false);
-    goToStep('profile-photo');
+    goToStep('welcome');
   };
 
   const handleCommunityDecline = () => {
@@ -64,20 +84,36 @@ export function OnboardingFlow() {
     goToStep('profile-setup');
   };
 
-  const handleProfilePhotoComplete = (photo?: File | null) => {
-    updateFormData({ profilePhoto: photo || null });
-    goToStep('complete');
+  const handleWelcomeContinue = () => {
+    goToStep('phone-entry');
   };
 
-  useEffect(() => {
-    if (currentStep === 'complete') {
-      // Handle completion
-      console.log('Onboarding completed with data:', formData);
-      setTimeout(() => {
-        alert('Welcome to Airbnb! Your account has been created.');
-      }, 500);
+
+
+  const handleProfilePhotoComplete = async (photo?: File | null) => {
+    if (photo) {
+      try {
+        await uploadAvatar(photo, formData.email);
+        updateFormData({ profilePhoto: photo });
+        
+        // Save avatar URL to localStorage for the Navbar to pick up
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          localStorage.setItem('userAvatar', reader.result as string);
+          window.dispatchEvent(new Event('storage')); // Trigger update in other components
+        };
+        reader.readAsDataURL(photo);
+      } catch {
+        // Error is handled by the caller or ignored if it's just an avatar upload
+      }
+
+
+
     }
-  }, [currentStep, formData]);
+    
+    // Redirect to home or sign-in as requested
+    window.location.href = '/';
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-neutral-50 to-white flex items-center justify-center p-4">
@@ -104,12 +140,24 @@ export function OnboardingFlow() {
       {currentStep === 'profile-setup' && (
         <ProfileSetupScreen
           onContinue={handleProfileSetup}
-          onBack={() => goToStep('phone-confirmation')}
+          onBack={() => goToStep('login')}
           initialData={{
             firstName: formData.firstName,
             lastName: formData.lastName,
             birthDate: formData.birthDate,
             email: formData.email,
+          }}
+        />
+      )}
+
+      {currentStep === 'phone-entry' && (
+        <PhoneEntryScreen
+          onContinue={handlePhoneEntry}
+          onBack={() => goToStep('profile-setup')}
+          isOpen={currentStep === 'phone-entry'}
+          initialData={{
+            phone: formData.phone,
+            country: formData.country,
           }}
         />
       )}
@@ -120,40 +168,22 @@ export function OnboardingFlow() {
         isOpen={showCommunityModal}
       />
 
+      {currentStep === 'welcome' && (
+        <WelcomeScreen
+          onContinue={handleWelcomeContinue}
+          onClose={() => goToStep('profile-setup')}
+          isOpen={currentStep === 'welcome'}
+        />
+      )}
+
       {currentStep === 'profile-photo' && (
         <ProfilePhotoScreen
           onContinue={handleProfilePhotoComplete}
           onBack={() => goToStep('profile-setup')}
         />
       )}
-
-      {currentStep === 'complete' && (
-        <div className="w-full max-w-md mx-auto">
-          <div className="bg-white rounded-2xl border border-neutral-200 shadow-sm p-8 text-center">
-            <div className="mb-6 flex justify-center">
-              <svg
-                className="w-16 h-16 text-green-600"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </div>
-            <h2 className="text-2xl font-bold text-neutral-900 mb-4">
-              Welcome to Airbnb!
-            </h2>
-            <p className="text-neutral-600">
-              Your account has been created successfully.
-            </p>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
+
+
