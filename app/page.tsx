@@ -8,7 +8,7 @@ import { OnboardingFlow } from "@/components/onboarding/OnboardingFlow";
 import { useListings } from "@/hooks/useListings";
 import { useSearchParams } from "next/navigation";
 import { Map } from "lucide-react";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 
 interface Listing {
   _id: string;
@@ -20,7 +20,7 @@ interface Listing {
   images: string[];
 }
 
-export default function Home() {
+function HomeContent() {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const searchParams = useSearchParams();
   const category = searchParams.get("category") || "National parks";
@@ -80,3 +80,16 @@ export default function Home() {
     </main>
   );
 }
+
+export default function Home() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    }>
+      <HomeContent />
+    </Suspense>
+  );
+}
+
