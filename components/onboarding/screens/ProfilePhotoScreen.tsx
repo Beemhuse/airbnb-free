@@ -4,6 +4,8 @@ import React, { useRef, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, Upload } from "lucide-react";
 import Image from "next/image";
+import { useToast } from "@/hooks/use-toast";
+
 
 interface ProfilePhotoScreenProps {
   // eslint-disable-next-line no-unused-vars
@@ -17,6 +19,7 @@ export function ProfilePhotoScreen({
   onContinue,
   onBack,
 }: ProfilePhotoScreenProps) {
+  const { toast } = useToast();
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -33,8 +36,19 @@ export function ProfilePhotoScreen({
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
-    if (selectedFile) setFile(selectedFile);
+    if (selectedFile) {
+      if (selectedFile.size > 5 * 1024 * 1024) {
+        toast({
+          title: "File too large",
+          description: "Please select an image smaller than 5MB.",
+          variant: "destructive",
+        });
+        return;
+      }
+      setFile(selectedFile);
+    }
   };
+
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
