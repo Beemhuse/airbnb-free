@@ -7,7 +7,7 @@ import { FloatingCountrySelector } from '../CountrySelector'
 import Modal from '../Modal'
 
 interface PhoneEntryScreenProps {
-  // eslint-disable-next-line no-unused-vars
+   
   onContinue: (_phone: string, _country: string) => Promise<void>
 
 
@@ -26,7 +26,7 @@ export function PhoneEntryScreen({
   isOpen,
   initialData,
 }: PhoneEntryScreenProps) {
-  const [phone, setPhone] = useState(initialData?.phone || '')
+  const [phone, setPhone] = useState('')
   const [country, setCountry] = useState(
     initialData?.country || 'Nigeria (+234)'
   )
@@ -67,7 +67,7 @@ export function PhoneEntryScreen({
     >
       {/* HEADER */}
       <div className="mb-6 text-center">
-        <p className="text-[11px] font-semibold text-neutral-400 tracking-widest mb-2">
+        <p className="text-[11px] font-semibold text-black tracking-widest mb-2">
           STEP 1 OF 2
         </p>
 
@@ -87,6 +87,8 @@ export function PhoneEntryScreen({
         <FloatingInput
           label="Phone number"
           type="tel"
+          inputMode="numeric"
+          pattern="[0-9]*"
           value={phone}
           onChange={(e) => {
             const val = e.target.value.replace(/\D/g, "");
@@ -95,7 +97,6 @@ export function PhoneEntryScreen({
           containerClassName="border-0 border-t border-neutral-300 rounded-none"
           errorMessage={error || undefined}
         />
-
       </div>
 
       {/* INFO TEXT */}

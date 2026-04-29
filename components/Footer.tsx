@@ -22,7 +22,9 @@ export default function Footer() {
                 alt="Airbnb"
                 width={20}
                 height={20}
+                loading="eager"
                 className="brightness-0 invert"
+                style={{ width: 20, height: 20 }}
               />
             </div>
             <span className="font-semibold text-xl md:text-2xl">Airbnb</span>

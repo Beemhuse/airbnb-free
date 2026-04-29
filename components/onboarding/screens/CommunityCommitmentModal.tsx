@@ -24,7 +24,7 @@ export function CommunityCommitmentModal({
       className="max-w-lg"
     >
       <div className="mb-6">
-      <Image src={'/airbnb-logo.png'} alt="Airbnb Logo" width={48} height={48} />
+      <Image src={'/airbnb-logo.png'} alt="Airbnb Logo" width={48} height={48} style={{ width: 'auto', height: 'auto' }} />
       </div>
 
       <p className="text-sm text-neutral-600 font-medium mb-2">Our community commitment</p>
