@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft } from "lucide-react";
 
 import FloatingInput from "@/components/ui/floating-input";
 import clsx from "clsx";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
+import Modal from "../Modal";
 
 interface ProfileSetupScreenProps {
    
@@ -26,12 +26,14 @@ interface ProfileSetupScreenProps {
     birthDate?: string;
     email?: string;
   };
+  isOpen?: boolean;
 }
 
 export function ProfileSetupScreen({
   onContinue,
   onBack,
   initialData,
+  isOpen = true,
 }: ProfileSetupScreenProps) {
   const [firstName, setFirstName] = useState(initialData?.firstName || "");
   const [lastName, setLastName] = useState(initialData?.lastName || "");
@@ -92,24 +94,14 @@ export function ProfileSetupScreen({
   };
 
   return (
-    <div className="w-full max-w-xl mx-auto">
-      <div className="bg-white rounded-2xl border border-neutral-200 shadow-sm">
-        <div className="w-full p-4 border-b">
-          <div className="flex justify-between w-2/3 items-center gap-4">
-            <button
-              onClick={onBack}
-              className="text-neutral-600 hover:text-neutral-900"
-            >
-              <ChevronLeft className="w-6 h-6" />
-            </button>
-
-            <h2 className="text-md font-bold text-neutral-900">
-              Finish signing up
-            </h2>
-          </div>
-        </div>
-        <div className=" p-8">
-          <form
+    <Modal
+      isOpen={isOpen}
+      onClose={onBack}
+      showBackButton
+      onBack={onBack}
+      title="Finish signing up"
+    >
+      <form
             onSubmit={(e) => {
               e.preventDefault();
               handleContinue();
@@ -254,11 +246,10 @@ export function ProfileSetupScreen({
                 "Agree and continue"
               )}
             </Button>
-          </form>
-        </div>
-      </div>
-    </div>
+      </form>
+    </Modal>
   );
 }
+
 
 

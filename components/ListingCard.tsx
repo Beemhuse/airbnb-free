@@ -5,6 +5,8 @@ import Image from 'next/image';
 import { Heart, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import clsx from 'clsx';
 
+import Link from 'next/link';
+
 interface ListingCardProps {
   listing: {
     _id: string;
@@ -25,17 +27,20 @@ export default function ListingCard({ listing }: ListingCardProps) {
   const images = listing.images.length > 0 ? listing.images : ['/placeholder.jpg'];
 
   const nextImage = (e: React.MouseEvent) => {
+    e.preventDefault();
     e.stopPropagation();
     setCurrentImageIndex((prev) => (prev + 1) % images.length);
   };
 
   const prevImage = (e: React.MouseEvent) => {
+    e.preventDefault();
     e.stopPropagation();
     setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
   };
 
   return (
-    <div 
+    <Link 
+      href={`/rooms/${listing._id}`}
       className="group cursor-pointer flex flex-col gap-2"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -46,12 +51,14 @@ export default function ListingCard({ listing }: ListingCardProps) {
           src={images[currentImageIndex]}
           alt={listing.title}
           fill
+          priority={true}
           className="object-cover transition duration-300 group-hover:scale-105"
         />
 
         {/* Favorite Button */}
         <button 
           onClick={(e) => {
+            e.preventDefault();
             e.stopPropagation();
             setIsFavorite(!isFavorite);
           }}
@@ -129,6 +136,6 @@ export default function ListingCard({ listing }: ListingCardProps) {
           <span className="font-light text-sm text-neutral-900"> night</span>
         </p>
       </div>
-    </div>
+    </Link>
   );
 }

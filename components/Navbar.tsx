@@ -36,6 +36,7 @@ export default function Navbar() {
             width={32}
             height={32}
             loading="eager"
+            style={{ width: 32, height: 32 }}
           />
           <span className="text-[#FF385C] text-xl font-bold tracking-tight hidden lg:inline">
             airbnb

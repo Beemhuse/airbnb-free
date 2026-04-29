@@ -33,7 +33,9 @@ export function WelcomeScreen({
             alt="Welcome" 
             width={80} 
             height={80} 
+            loading="eager"
             className="rounded-xl shadow-sm"
+            style={{ width: 80, height: 80 }}
             onError={(e) => {
               // Fallback if image doesn't exist
               const target = e.target as HTMLImageElement;

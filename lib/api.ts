@@ -56,6 +56,16 @@ export async function fetchListings(category?: string) {
   return response.json();
 }
 
+export async function fetchListingById(id: string) {
+  const response = await apiFetch(`${API_URL}/listings/${id}`, { method: "GET" });
+  if (!response.ok) {
+    const message = await parseErrorMessage(response, "Failed to fetch listing");
+    throw new Error(message);
+  }
+  return response.json();
+}
+
+
 export async function sendOtp(email: string) {
   const response = await apiFetch(`${API_URL}/auth/send-otp`, {
     method: "POST",

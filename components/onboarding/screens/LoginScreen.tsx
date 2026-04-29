@@ -33,13 +33,17 @@ export function LoginScreen({ onClose, onSuccess }: LoginScreenProps) {
       if (onSuccess) {
         onSuccess();
       } else {
-        // window.location.href = "/";
+        window.location.href = "/";
       }
     } catch (err: unknown) {
-     // eslint-disable-next-line no-console
-     console.error(err)
+      toast({
+        title: "Login failed",
+        description: err instanceof Error ? err.message : "Invalid email or password.",
+        variant: "destructive",
+      });
     }
   };
+
 
 
 

@@ -178,7 +178,8 @@ export function OnboardingFlow({ onClose }: OnboardingFlowProps) {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-neutral-50 to-white flex items-center justify-center p-4">
-      {currentStep === 'login' && (
+      {/* Base Screen - Always rendered in background */}
+      <div className={currentStep !== 'login' ? 'pointer-events-none' : ''}>
         <InitialLoginScreen
           onContinue={handleInitialLoginContinue}
           onClose={onClose}
@@ -188,7 +189,7 @@ export function OnboardingFlow({ onClose }: OnboardingFlowProps) {
             phone: formData.phone,
           }}
         />
-      )}
+      </div>
 
       {currentStep === 'login-password' && (
         <LoginPasswordScreen
@@ -204,6 +205,7 @@ export function OnboardingFlow({ onClose }: OnboardingFlowProps) {
         <ProfileSetupScreen
           onContinue={handleProfileSetup}
           onBack={() => goToStep('login')}
+          isOpen={currentStep === 'profile-setup'}
           initialData={{
             firstName: formData.firstName,
             lastName: formData.lastName,
@@ -252,8 +254,10 @@ export function OnboardingFlow({ onClose }: OnboardingFlowProps) {
         <ProfilePhotoScreen
           onContinue={handleProfilePhotoComplete}
           onBack={() => goToStep('profile-setup')}
+          isOpen={currentStep === 'profile-photo'}
         />
       )}
+
     </div>
   );
 }
